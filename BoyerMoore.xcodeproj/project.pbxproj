@@ -10,6 +10,7 @@
 		7506FA021B7F2F20006241CC /* BoyerMoore.h in Headers */ = {isa = PBXBuildFile; fileRef = 7506FA011B7F2F20006241CC /* BoyerMoore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7506FA091B7F2F20006241CC /* BoyerMoore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7506F9FE1B7F2F20006241CC /* BoyerMoore.framework */; };
 		7506FA0E1B7F2F20006241CC /* BoyerMooreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7506FA0D1B7F2F20006241CC /* BoyerMooreTests.swift */; };
+		7506FA191B7F2F2F006241CC /* BoyerMoore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7506FA181B7F2F2F006241CC /* BoyerMoore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +30,7 @@
 		7506FA081B7F2F20006241CC /* BoyerMooreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoyerMooreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7506FA0D1B7F2F20006241CC /* BoyerMooreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoyerMooreTests.swift; sourceTree = "<group>"; };
 		7506FA0F1B7F2F20006241CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7506FA181B7F2F2F006241CC /* BoyerMoore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoyerMoore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 		7506FA001B7F2F20006241CC /* BoyerMoore */ = {
 			isa = PBXGroup;
 			children = (
+				7506FA181B7F2F2F006241CC /* BoyerMoore.swift */,
 				7506FA011B7F2F20006241CC /* BoyerMoore.h */,
 				7506FA031B7F2F20006241CC /* Info.plist */,
 			);
@@ -142,6 +145,7 @@
 		7506F9F51B7F2F20006241CC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Marcin Krzyżanowski";
 				TargetAttributes = {
@@ -193,6 +197,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7506FA191B7F2F2F006241CC /* BoyerMoore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,6 +312,7 @@
 		7506FA131B7F2F20006241CC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -317,16 +323,19 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.krzyzanowskim.BoyerMoore;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		7506FA141B7F2F20006241CC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_TESTABILITY = YES;
 				INFOPLIST_FILE = BoyerMoore/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -375,6 +384,7 @@
 				7506FA141B7F2F20006241CC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7506FA151B7F2F20006241CC /* Build configuration list for PBXNativeTarget "BoyerMooreTests" */ = {
 			isa = XCConfigurationList;
@@ -383,6 +393,7 @@
 				7506FA171B7F2F20006241CC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -11,26 +11,105 @@ import XCTest
 
 class BoyerMooreTests: XCTestCase {
     
+    let data = [72,69,82,69,32,73,83,32,  65,32,83,73 ,77,80,76,69,32,69,88,65,77,80,76,69]
+    
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testDelta1() {
+        let bm = BoyerMoore(data: data)
+        let pat1 = [69,88,65,77,80,76,69]
+        XCTAssert(bm.delta1(pat1, char: 65) == 4)
+        XCTAssert(bm.delta1(pat1, char: 69) == 6)
+        XCTAssert(bm.delta1(pat1, char: 76) == 1)
+        XCTAssert(bm.delta1(pat1, char: 77) == 3)
+        XCTAssert(bm.delta1(pat1, char: 80) == 2)
+        XCTAssert(bm.delta1(pat1, char: 88) == 5)
+        XCTAssert(bm.delta1(pat1, char: 00) == 7)
+        
+        let pat2 = [59,88,65,77,69,69,69]
+        XCTAssert(bm.delta1(pat2, char: 69) == 1)
+        XCTAssert(bm.delta1(pat2, char: 59) == 6)
+        
+        let pat3 = [59,69,65,77,69,00,00]
+        XCTAssert(bm.delta1(pat3, char: 59) == 6)
+        XCTAssert(bm.delta1(pat3, char: 69) == 2)
+        XCTAssert(bm.delta1(pat3, char: 00) == 1)
+        
+        let pat4 = [69,79,65,77,89,00,00]
+        XCTAssert(bm.delta1(pat4, char: 69) == 6)
+        
+        let pat5 = [00,79,65,77,89,00,01]
+        XCTAssert(bm.delta1(pat5, char: 00) == 1)
+        XCTAssert(bm.delta1(pat5, char: 01) == 7)
     }
     
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
+    func testSuffixes() {
+        let bm = BoyerMoore(data: data)
+        XCTAssert(bm.suffixes([69,88,65,77,80,76,69]) == [1,0,0,0,0,0,7])
+    }
+    
+    func testSearch() {
+        let bm = BoyerMoore(data: data)
+        XCTAssertNoThrowValidateValue(try bm.search([65,32,83,73])) { $0.startIndex == 8 }
+        XCTAssertThrow(try bm.search([65,32,183,73]))
+        XCTAssertNoThrowValidateValue(try bm.search([72])) { $0.startIndex == 0 }
+    }
+    
+    func testPerformanceBoyerMoore() {
+        let loremText = "Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Cras mattis consectetur purus sit amet fermentum. Maecenas faucibus mollis interdum."
+        let loremData:[Int] = Array(loremText.unicodeScalars).map { Int($0.value) }
+        self.measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: true) { () -> Void in
+            for _ in 0...9999 {
+                try! BoyerMoore(data: loremData).search([105, 109, 101, 110, 116, 117, 109, 32, 110, 105, 98, 104, 44, 32])
+            }
         }
     }
     
+    func testPerformanceNSData() {
+        let loremText = "Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Cras mattis consectetur purus sit amet fermentum. Maecenas faucibus mollis interdum."
+        let loremData:[Int] = Array(loremText.unicodeScalars).map { Int($0.value) }
+        let data = NSData(bytes: loremData, length: loremData.count)
+        let searchData = NSData(bytes: [65,32,83,73], length: 4)
+        self.measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: true) { () -> Void in
+            for _ in 0...9999 {
+                data.rangeOfData(searchData, options: NSDataSearchOptions(rawValue: 0), range: NSRange(location: 0, length: data.length))
+            }
+        }
+    }
+    
+    func testPerformanceString() {
+        let loremText = "Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Cras mattis consectetur purus sit amet fermentum. Maecenas faucibus mollis interdum."
+        self.measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: true) { () -> Void in
+            for _ in 0...9999 {
+                loremText.rangeOfString("imentum nibh,")
+            }
+        }
+    }
+
+}
+
+
+
+private func XCTAssertNoThrowValidateValue<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__, _ validator: (T) -> Bool) {
+    do {
+        let result = try expression()
+        XCTAssert(validator(result), "Value validation failed - \(message)", file: file, line: line)
+    } catch let error {
+        XCTFail("Caught error: \(error) - \(message)", file: file, line: line)
+    }
+}
+
+private func XCTAssertThrow<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: String = __FILE__, line: UInt = __LINE__) {
+    do {
+        try expression()
+        XCTFail(message, file: file, line: line)
+    } catch _ {
+        XCTAssert(true)
+    }
 }
