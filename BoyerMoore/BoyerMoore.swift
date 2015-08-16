@@ -9,6 +9,11 @@
 import Foundation
 
 struct BoyerMoore {
+    
+    enum BoyerMooreError: ErrorType {
+        case NotFound
+    }
+    
     private let data:[Int]
     
     init(data: [Int]) {
@@ -25,35 +30,8 @@ struct BoyerMoore {
         return pat.count - i
     }
     
-    func suffixes(pat:[Int]) -> [Int] {
-        var suff = [Int](count: pat.count, repeatedValue: 0)
-
-        suff[pat.count - 1] = pat.count
-        var g = pat.count - 1
-        var f = 0
-        for (var i = pat.count - 2; i >= 0; --i) {
-            if (i > g && suff[i + pat.count - 1 - f] < i - g) {
-                suff[i] = suff[i + pat.count - 1 - f]
-            } else {
-                if i < g {
-                    g = i
-                }
-                f = i
-                while (g >= 0 && pat[g] == pat[g + pat.count - 1 - f]) {
-                    --g
-                }
-                suff[i] = f - g
-            }
-        }
-        return suff
-    }
-    
-    func delta2(j: Int) -> Int {
-        return 0
-    }
-    
-    enum BoyerMooreError: ErrorType {
-        case NotFound
+    func search(pat: String) throws -> Range<Int> {
+        return try search(pat.unicodeScalars.map { Int($0.value) })
     }
     
     func search(pat:[Int]) throws -> Range<Int> {
@@ -62,19 +40,34 @@ struct BoyerMoore {
         }
         
         var i = pat.count - 1
+        var j = 0
         while (i < data.count) {
-            var j = pat.count - 1
-            while (j >= 0 && data[i] == pat[j]) {
-                --i
-                --j
-            }
+            for (j = pat.count - 1; j >= 0 && data[i] == pat[j]; --i, --j) { /* noop */ }
             if (j < 0) {
                 return Range(start:i + 1, end:i + 1 + pat.count)
             }
             
-            i = i + max(delta1(pat, char: data[i]), delta2(j))
+            i = i + delta1(pat, char: data[i])
         }
         
         throw BoyerMooreError.NotFound
+    }
+}
+
+extension BoyerMoore: StringLiteralConvertible {
+    //MARK: StringLiteralConvertible
+    
+    init(stringLiteral value: String) {
+        self.data = value.unicodeScalars.map { Int($0.value) }
+    }
+    
+    typealias UnicodeScalarLiteralType = StringLiteralType
+    init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
+        self.init(stringLiteral: value)
+    }
+    
+    typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
+    init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
+        self.init(stringLiteral: value)
     }
 }

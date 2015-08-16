@@ -49,11 +49,6 @@ class BoyerMooreTests: XCTestCase {
         XCTAssert(bm.delta1(pat5, char: 01) == 7)
     }
     
-    func testSuffixes() {
-        let bm = BoyerMoore(data: data)
-        XCTAssert(bm.suffixes([69,88,65,77,80,76,69]) == [1,0,0,0,0,0,7])
-    }
-    
     func testSearch() {
         let bm = BoyerMoore(data: data)
         XCTAssertNoThrowValidateValue(try bm.search([65,32,83,73])) { $0.startIndex == 8 }
@@ -61,9 +56,17 @@ class BoyerMooreTests: XCTestCase {
         XCTAssertNoThrowValidateValue(try bm.search([72])) { $0.startIndex == 0 }
     }
     
+    func testSearchString() {
+        let bm = BoyerMoore(stringLiteral: "HERE IS A SIMPLE EXAMPLE")
+        XCTAssertNoThrowValidateValue(try bm.search("A SI")) { $0.startIndex == 8 }
+        XCTAssertThrow(try bm.search("AXSI"))
+        XCTAssertNoThrowValidateValue(try bm.search("H")) { $0.startIndex == 0 }
+    }
+
+    
     func testPerformanceBoyerMoore() {
         let loremText = "Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Cras mattis consectetur purus sit amet fermentum. Maecenas faucibus mollis interdum."
-        let loremData:[Int] = Array(loremText.unicodeScalars).map { Int($0.value) }
+        let loremData = loremText.unicodeScalars.map { Int($0.value) }
         self.measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: true) { () -> Void in
             for _ in 0...9999 {
                 try! BoyerMoore(data: loremData).search([105, 109, 101, 110, 116, 117, 109, 32, 110, 105, 98, 104, 44, 32])
@@ -73,7 +76,7 @@ class BoyerMooreTests: XCTestCase {
     
     func testPerformanceNSData() {
         let loremText = "Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Cras mattis consectetur purus sit amet fermentum. Maecenas faucibus mollis interdum."
-        let loremData:[Int] = Array(loremText.unicodeScalars).map { Int($0.value) }
+        let loremData = loremText.unicodeScalars.map { Int($0.value) }
         let data = NSData(bytes: loremData, length: loremData.count)
         let searchData = NSData(bytes: [65,32,83,73], length: 4)
         self.measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: true) { () -> Void in
@@ -83,7 +86,30 @@ class BoyerMooreTests: XCTestCase {
         }
     }
     
+    func testPerformanceCFData() {
+        let loremText = "Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Cras mattis consectetur purus sit amet fermentum. Maecenas faucibus mollis interdum."
+        let loremData = loremText.unicodeScalars.map { UInt8($0.value) }
+        let data = CFDataCreate(nil, loremData, loremData.count)
+        let searchData = CFDataCreate(nil, [65,32,83,73], 4)
+        
+        self.measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: true) { () -> Void in
+            for _ in 0...9999 {
+                CFDataFind(data, searchData, CFRangeMake(0, loremData.count), CFDataSearchFlags(rawValue: 0))
+            }
+        }
+    }
+
     func testPerformanceString() {
+        let loremText = "Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Cras mattis consectetur purus sit amet fermentum. Maecenas faucibus mollis interdum."
+        self.measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: true) { () -> Void in
+            for _ in 0...9999 {
+                /// map() is so slow
+                try! BoyerMoore(stringLiteral: loremText).search("imentum nibh,")
+            }
+        }
+    }
+
+    func testPerformanceFoundationNSString() {
         let loremText = "Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Cras mattis consectetur purus sit amet fermentum. Maecenas faucibus mollis interdum."
         self.measureMetrics([XCTPerformanceMetric_WallClockTime], automaticallyStartMeasuring: true) { () -> Void in
             for _ in 0...9999 {
