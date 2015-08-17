@@ -2,7 +2,7 @@
 
 Boyer-Moore algorithm is the basis of the fastest known ways to find one string of characters in another.
 
-Read: [Fast pattern search in Swift... since 1974](http://blog.krzyzanowskim.com/fast-pattern-search-in-swift-since-1974)
+Read: [Fast pattern search in Swift... since 1974](http://blog.krzyzanowskim.com/2015/08/16/fast-pattern-search-in-swift-since-1974/
 
 ##Author
 Marcin Krzyżanowski
